@@ -15,7 +15,7 @@ function Show-TimerInput {
     $form.MinimizeBox = $true
 
     # Icon
-    $iconPath = "C:\Users\wvpda\OneDrive\Documents\shutdown.ico"
+    $iconPath = "shutdown.ico"
     if (Test-Path $iconPath) {
         $form.Icon = New-Object System.Drawing.Icon($iconPath)
     }
