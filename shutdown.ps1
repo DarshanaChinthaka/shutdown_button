@@ -1,11 +1,15 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-If (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    # 🔐 Prevent system sleep while shutdown timer is active
- powercfg /requestsoverride process "shutdown.exe" system display
-  #  exit
+$isAdmin = ([Security.Principal.WindowsPrincipal] `
+        [Security.Principal.WindowsIdentity]::GetCurrent()
+).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if ($isAdmin) {
+    powercfg /requestsoverride process "shutdown.exe" system awaymode
 }
+ 
+ 
 
 
 
@@ -50,9 +54,9 @@ function Show-TimerInput {
     $okButton.ForeColor = "White"
     $okButton.FlatStyle = "Flat"
     $okButton.Add_Click({
-        $form.DialogResult = "OK"
-        $form.Close()
-    })
+            $form.DialogResult = "OK"
+            $form.Close()
+        })
     $form.Controls.Add($okButton)
     $form.AcceptButton = $okButton
 
@@ -72,7 +76,8 @@ function Show-TimerInput {
             return
         }
         return [int]$textbox.Text
-    } else {
+    }
+    else {
         return $null
     }
 }
@@ -112,9 +117,12 @@ function Show-CancelPopup {
     $cancelButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
     $cancelButton.FlatStyle = "Flat"
     $cancelButton.Add_Click({
-        $global:cancelled = $true
-        $form.Close()
-    })
+            $global:cancelled = $true
+            if ($isAdmin) {
+                powercfg /requestsoverride process "shutdown.exe"
+            }
+            $form.Close()
+        })
     $form.Controls.Add($cancelButton)
     $form.AcceptButton = $cancelButton
 
@@ -122,9 +130,9 @@ function Show-CancelPopup {
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 15000
     $timer.Add_Tick({
-        $timer.Stop()
-        $form.Close()
-    })
+            $timer.Stop()
+            $form.Close()
+        })
     $timer.Start()
 
     [System.Windows.Forms.Application]::Run($form)
@@ -145,11 +153,9 @@ if (-not $global:cancelled) {
     shutdown /s /t 0
 }
 
-If (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    #  clear override when done
- powercfg /requestsoverride process "shutdown.exe"
-
-   # exit
+if ($isAdmin) {
+    powercfg /requestsoverride process "shutdown.exe"
 }
+
 
 
