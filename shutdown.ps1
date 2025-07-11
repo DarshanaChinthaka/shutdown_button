@@ -1,6 +1,10 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
+# 🔐 Prevent system sleep while shutdown timer is active
+powercfg /requestsoverride process "shutdown.exe" system display
+
+
 function Show-TimerInput {
     [System.Media.SystemSounds]::Hand.Play()
 
@@ -136,3 +140,5 @@ if (-not $global:cancelled) {
     Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
     shutdown /s /t 0
 }
+#  clear override when done
+powercfg /requestsoverride process "Shutdown.exe"
