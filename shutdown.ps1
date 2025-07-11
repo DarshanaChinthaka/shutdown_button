@@ -11,6 +11,14 @@ $rawSleepDC = (powercfg /query SCHEME_CURRENT SUB_SLEEP STANDBYIDLE) `
 | Select-String "Power Setting Index" | Select-Object -Last 1
 $oldSleepTimerDC = [convert]::ToInt32(($rawSleepDC -replace ".*0x", ""), 16)
 
+# If mistakenly returned seconds instead of minutes, convert
+if ($oldSleepTimerAC -gt 180) {
+    $oldSleepTimerAC = [math]::Round($oldSleepTimerAC / 60)
+}
+if ($oldSleepTimerDC -gt 180) {
+    $oldSleepTimerDC = [math]::Round($oldSleepTimerDC / 60)
+}
+
 
 function Show-TimerInput {
     [System.Media.SystemSounds]::Hand.Play()
@@ -85,6 +93,9 @@ function Show-TimerInput {
 }
 
 function Show-CancelPopup {
+    powercfg /change standby-timeout-ac $oldSleepTimerAC
+    powercfg /change standby-timeout-dc $oldSleepTimerDC
+
     [System.Media.SystemSounds]::Hand.Play()
 
     $form = New-Object System.Windows.Forms.Form
