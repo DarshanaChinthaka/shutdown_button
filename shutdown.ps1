@@ -50,7 +50,7 @@ function Show-TimerInput {
 
     # Watermark
     $watermark = New-Object System.Windows.Forms.Label
-    $watermark.Text = "Project by Darshana"
+    $watermark.Text = "Project By Darshana"
     $watermark.Location = New-Object System.Drawing.Point(210, 120)
     $watermark.Size = New-Object System.Drawing.Size(150, 15)
     $watermark.Font = New-Object System.Drawing.Font("Segoe UI", 7.5, [System.Drawing.FontStyle]::Italic)
@@ -83,7 +83,7 @@ function Show-CancelPopup {
     $form.MinimizeBox = $true
 
     # Icon
-    $iconPath = "C:\Users\wvpda\OneDrive\Documents\shutdown.ico"
+    $iconPath = "shutdown.ico"
     if (Test-Path $iconPath) {
         $form.Icon = New-Object System.Drawing.Icon($iconPath)
     }
