@@ -1,8 +1,12 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
-# 🔐 Prevent system sleep while shutdown timer is active
-powercfg /requestsoverride process "shutdown.exe" system display
+If (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    # 🔐 Prevent system sleep while shutdown timer is active
+ powercfg /requestsoverride process "shutdown.exe" system display
+  #  exit
+}
+
 
 
 function Show-TimerInput {
@@ -140,5 +144,12 @@ if (-not $global:cancelled) {
     Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
     shutdown /s /t 0
 }
-#  clear override when done
-powercfg /requestsoverride process "Shutdown.exe"
+
+If (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    #  clear override when done
+ powercfg /requestsoverride process "shutdown.exe"
+
+   # exit
+}
+
+

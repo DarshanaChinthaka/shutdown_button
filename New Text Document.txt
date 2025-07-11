@@ -1,0 +1,5 @@
+Invoke-ps2exe `
+-inputFile "C:\Users\wvpda\OneDrive\Documents\GitHub\shutdown_button\shutdown.ps1" `
+-outputFile "C:\Users\wvpda\OneDrive\Documents\GitHub\shutdown_button\shutdown.exe" `
+-iconFile "C:\Users\wvpda\OneDrive\Documents\GitHub\shutdown_button\shutdown.ico" `
+-noConsole
