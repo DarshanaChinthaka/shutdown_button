@@ -1,13 +1,5 @@
 Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
-If (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    # 🔐 Prevent system sleep while shutdown timer is active
- powercfg /requestsoverride process "shutdown.exe" system display
-  #  exit
-}
-
-
+Add-Type -AssemblyName System.Drawing  
 
 function Show-TimerInput {
     [System.Media.SystemSounds]::Hand.Play()
@@ -145,9 +137,3 @@ if (-not $global:cancelled) {
     shutdown /s /t 0
 }
 
-If (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    #  clear override when done
- powercfg /requestsoverride process "shutdown.exe"
-
-   # exit
-}
