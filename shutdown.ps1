@@ -1,8 +1,15 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing  
 
+# --- AC (plugged in) sleep timeout ---
+$rawSleepAC = (powercfg /query SCHEME_CURRENT SUB_SLEEP STANDBYIDLE) `
+| Select-String "Power Setting Index" | Select-Object -First 1
+$oldSleepTimerAC = [convert]::ToInt32(($rawSleepAC -replace ".*0x", ""), 16)
 
-
+# --- DC (battery) sleep timeout ---
+$rawSleepDC = (powercfg /query SCHEME_CURRENT SUB_SLEEP STANDBYIDLE) `
+| Select-String "Power Setting Index" | Select-Object -Last 1
+$oldSleepTimerDC = [convert]::ToInt32(($rawSleepDC -replace ".*0x", ""), 16)
 
 
 function Show-TimerInput {
@@ -16,7 +23,7 @@ function Show-TimerInput {
     $form.TopMost = $true
     $form.FormBorderStyle = 'FixedDialog'
     $form.MaximizeBox = $false
-    $form.MinimizeBox = $true
+    $form.MinimizeBox = $true   
 
     # Icon
     $iconPath = "shutdown.ico"
@@ -46,9 +53,12 @@ function Show-TimerInput {
     $okButton.ForeColor = "White"
     $okButton.FlatStyle = "Flat"
     $okButton.Add_Click({
-        $form.DialogResult = "OK"
-        $form.Close()
-    })
+            $form.DialogResult = "OK"
+            powercfg /change standby-timeout-ac 14
+            powercfg /change standby-timeout-dc 16
+
+            $form.Close()
+        })
     $form.Controls.Add($okButton)
     $form.AcceptButton = $okButton
 
@@ -68,7 +78,8 @@ function Show-TimerInput {
             return
         }
         return [int]$textbox.Text
-    } else {
+    }
+    else {
         return $null
     }
 }
@@ -108,9 +119,9 @@ function Show-CancelPopup {
     $cancelButton.Font = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
     $cancelButton.FlatStyle = "Flat"
     $cancelButton.Add_Click({
-        $global:cancelled = $true
-        $form.Close()
-    })
+            $global:cancelled = $true
+            $form.Close()
+        })
     $form.Controls.Add($cancelButton)
     $form.AcceptButton = $cancelButton
 
@@ -118,9 +129,9 @@ function Show-CancelPopup {
     $timer = New-Object System.Windows.Forms.Timer
     $timer.Interval = 15000
     $timer.Add_Tick({
-        $timer.Stop()
-        $form.Close()
-    })
+            $timer.Stop()
+            $form.Close()
+        })
     $timer.Start()
 
     [System.Windows.Forms.Application]::Run($form)
