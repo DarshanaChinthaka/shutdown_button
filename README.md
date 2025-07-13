@@ -9,6 +9,7 @@ A lightweight GUI-based PowerShell script to schedule a system shutdown with a c
 - Prevents sleep, lock, and display-off
 - Resets lid-close action after run
 - Works as script or EXE
+- No Installation Required
 
 ## ⚙️ How to Use
 
