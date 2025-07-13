@@ -14,10 +14,11 @@ public class SleepBlocker {
 # Workaround: use [uint32]::Parse with unsigned decimal value strings
 $ES_CONTINUOUS = [uint32]::Parse("2147483648")
 $ES_SYSTEM_REQUIRED = [uint32]::Parse("1")
+$ES_DISPLAY_REQUIRED = [uint32]::Parse("2") 
 
-# Prevent sleep
-[SleepBlocker]::SetThreadExecutionState($ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED) | Out-Null
-
+# Combine flags to prevent sleep + lock (display off)
+$flags = $ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED -bor $ES_DISPLAY_REQUIRED
+[SleepBlocker]::SetThreadExecutionState($flags) | Out-Null
 
 
 # ✅ Check if running as Administrator
@@ -114,7 +115,7 @@ function Show-TimerInput {
 
 function Show-CancelPopup {
     # Restore sleep
-[SleepBlocker]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
+    [SleepBlocker]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
 
     if ($isAdmin) {
 
@@ -194,6 +195,6 @@ Show-CancelPopup
 
 if (-not $global:cancelled) {
     Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
-    shutdown /s /t 0
+    shutdown /s /f /t 0
 }
 
