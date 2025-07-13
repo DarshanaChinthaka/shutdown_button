@@ -61,9 +61,9 @@ function Show-TimerInput {
     $okButton.ForeColor = "White"
     $okButton.FlatStyle = "Flat"
     $okButton.Add_Click({
-            $form.DialogResult = "OK"
-            powercfg /change standby-timeout-ac 14
-            powercfg /change standby-timeout-dc 16
+            $form.DialogResult = "OK"# ✅ Set sleep timeout to user-defined minutes
+            powercfg /change standby-timeout-ac 12
+            powercfg /change standby-timeout-dc 11
 
             $form.Close()
         })
