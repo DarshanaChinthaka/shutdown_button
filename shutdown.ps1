@@ -1,23 +1,10 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing  
 
-# --- AC (plugged in) sleep timeout ---
-$rawSleepAC = (powercfg /query SCHEME_CURRENT SUB_SLEEP STANDBYIDLE) `
-| Select-String "Power Setting Index" | Select-Object -First 1
-$oldSleepTimerAC = [convert]::ToInt32(($rawSleepAC -replace ".*0x", ""), 16)
-
-# --- DC (battery) sleep timeout ---
-$rawSleepDC = (powercfg /query SCHEME_CURRENT SUB_SLEEP STANDBYIDLE) `
-| Select-String "Power Setting Index" | Select-Object -Last 1
-$oldSleepTimerDC = [convert]::ToInt32(($rawSleepDC -replace ".*0x", ""), 16)
-
-# If mistakenly returned seconds instead of minutes, convert
-if ($oldSleepTimerAC -gt 180) {
-    $oldSleepTimerAC = [math]::Round($oldSleepTimerAC / 60)
-}
-if ($oldSleepTimerDC -gt 180) {
-    $oldSleepTimerDC = [math]::Round($oldSleepTimerDC / 60)
-}
+# ✅ Check if running as Administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal] `
+    [Security.Principal.WindowsIdentity]::GetCurrent()
+).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 
 function Show-TimerInput {
@@ -61,12 +48,22 @@ function Show-TimerInput {
     $okButton.ForeColor = "White"
     $okButton.FlatStyle = "Flat"
     $okButton.Add_Click({
-            $form.DialogResult = "OK"# ✅ Set sleep timeout to user-defined minutes
-            powercfg /change standby-timeout-ac 12
-            powercfg /change standby-timeout-dc 11
+            $form.DialogResult = "OK"
+            if ($isAdmin) {
+
+            # 🔁 AC Power - Set lid close action to 'Sleep'
+                powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+
+                # 🔁 Battery Power - Set lid close action to 'Sleep'
+                powercfg /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
+
+                # 🔄 Apply changes
+                powercfg /S SCHEME_CURRENT
+            
+            }
 
             $form.Close()
-        })
+    })
     $form.Controls.Add($okButton)
     $form.AcceptButton = $okButton
 
@@ -93,8 +90,19 @@ function Show-TimerInput {
 }
 
 function Show-CancelPopup {
-    powercfg /change standby-timeout-ac $oldSleepTimerAC
-    powercfg /change standby-timeout-dc $oldSleepTimerDC
+    if ($isAdmin) {
+
+            # 🔁 AC Power - Set lid close action to 'Sleep'
+                powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
+
+                # 🔁 Battery Power - Set lid close action to 'Sleep'
+                powercfg /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
+
+                # 🔄 Apply changes
+                powercfg /S SCHEME_CURRENT
+            
+            }
+    
 
     [System.Media.SystemSounds]::Hand.Play()
 
