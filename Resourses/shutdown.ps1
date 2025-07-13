@@ -25,13 +25,13 @@ $flags = $ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED  -bor $ES_DISPLAY_REQUIRED
 
 # Check if script is running as administrator
 
-$isAdmin = ([Security.Principal.WindowsPrincipal] `
-        [Security.Principal.WindowsIdentity]::GetCurrent()
-).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-
-
-
+if (-not ([Security.Principal.WindowsPrincipal] `
+    [Security.Principal.WindowsIdentity]::GetCurrent()
+).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    
+    # Relaunch script with Administrator privileges
+    Start-Process powershell -Verb runAs -ArgumentList ("-NoProfile -ExecutionPolicy Bypass -File `"" + $PSCommandPath + "`"")
+    #exit
 
 
 function Show-TimerInput {
@@ -48,7 +48,7 @@ function Show-TimerInput {
     $form.MinimizeBox = $true   
 
     # Icon
-    $iconPath = "shutdown.ico"
+    $iconPath = ".\Resourses\shutdown.ico"
     if (Test-Path $iconPath) {
         $form.Icon = New-Object System.Drawing.Icon($iconPath)
     }
@@ -76,7 +76,6 @@ function Show-TimerInput {
     $okButton.FlatStyle = "Flat"
     $okButton.Add_Click({
             $form.DialogResult = "OK"
-            if ($isAdmin) {
 
                 # 🔁 AC Power - Set lid close action to 'Sleep'
                 powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
@@ -87,7 +86,7 @@ function Show-TimerInput {
                 # 🔄 Apply changes
                 powercfg /S SCHEME_CURRENT
             
-            }
+            
 
             $form.Close()
         })
@@ -120,7 +119,7 @@ function Show-CancelPopup {
     # Restore sleep
     [SleepBlocker]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
 
-    if ($isAdmin) {
+    
 
         # 🔁 AC Power - Set lid close action to 'Sleep'
         powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
@@ -131,7 +130,7 @@ function Show-CancelPopup {
         # 🔄 Apply changes
         powercfg /S SCHEME_CURRENT
             
-    }
+    
     
 
     [System.Media.SystemSounds]::Hand.Play()
@@ -147,7 +146,7 @@ function Show-CancelPopup {
     $form.MinimizeBox = $true
 
     # Icon
-    $iconPath = "shutdown.ico"
+    $iconPath = ".\Resources\shutdown.ico"
     if (Test-Path $iconPath) {
         $form.Icon = New-Object System.Drawing.Icon($iconPath)
     }
@@ -200,4 +199,4 @@ if (-not $global:cancelled) {
     Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
     shutdown /s /f /t 0
 }
-
+}
