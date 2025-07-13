@@ -10,6 +10,8 @@ A lightweight GUI-based PowerShell script to schedule a system shutdown with a c
 - Resets lid-close action after run
 - Works as script or EXE
 - No Installation Required
+- 🎬 You can close the laptop lid while a video is playing
+-  — the PC will stay awake and continue playback.
 
 ## ⚙️ How to Use
 
