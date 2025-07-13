@@ -7,6 +7,19 @@ $isAdmin = ([Security.Principal.WindowsPrincipal] `
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 
+
+# Get the current Lid close action (plugged in) setting
+$lidCloseRaw = powercfg /query SCHEME_CURRENT SUB_BUTTONS LIDACTION | Select-String "Power Setting Index" | Select-Object -First 1
+
+# Extract the value (in hex, like 0x00000001)
+#$hexValue = ($lidCloseRaw -split ':')[1].Trim()
+
+# Convert hex to integer
+#$lidClose = [convert]::ToInt32($hexValue, 16)
+
+
+
+
 function Show-TimerInput {
     [System.Media.SystemSounds]::Hand.Play()
 

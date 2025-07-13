@@ -1,13 +1,11 @@
-# WMI event query for lid close (power event 4 = lid close)
-$query = "SELECT * FROM Win32_PowerManagementEvent WHERE EventType = 4"
+# Get the current Lid close action (plugged in) setting
+$lidCloseRaw = powercfg /query SCHEME_CURRENT SUB_BUTTONS LIDACTION | Select-String "Power Setting Index" | Select-Object -First 1
 
-# Create event watcher
-$watcher = New-Object System.Management.ManagementEventWatcher $query
+# Extract the value (in hex, like 0x00000001)
+$hexValue = ($lidCloseRaw -split ':')[1].Trim()
 
-Write-Host "Waiting for laptop lid close event..."
+# Convert hex to integer
+$lidClose = [convert]::ToInt32($hexValue, 16)
 
-while ($true) {
-    $event = $watcher.WaitForNextEvent()
-    Write-Host "Laptop lid closed detected at $(Get-Date)"
-    # මෙතනට ඔබට ලැප්ටොප් lid close event එකට assign කරන්න අවශ්‍ය code එක දාන්න
-}
+# Output value for testing (optional)
+Write-Host "Lid Close Action (Plugged in): $lidClose"
