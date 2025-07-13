@@ -1,5 +1,5 @@
 Invoke-ps2exe `
--inputFile "shutdown.ps1" `
--outputFile "shutdown.exe" `
--iconFile "shutdown.ico" `
+-inputFile "exe creater.ps1" `
+-outputFile "exe creater.exe" `
+-iconFile ".\shutdown.ico" `
 -noConsole
