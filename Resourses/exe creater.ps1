@@ -3,4 +3,4 @@ Invoke-ps2exe `
   -outputFile "shutdown.exe" `
   -iconFile "Resourses\shutdown.ico" `
   -noConsole `
-  -requireAdmin
+  #-requireAdmin
