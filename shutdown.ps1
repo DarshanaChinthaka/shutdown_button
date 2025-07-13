@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Drawing
 
 # ✅ Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] `
-    [Security.Principal.WindowsIdentity]::GetCurrent()
+        [Security.Principal.WindowsIdentity]::GetCurrent()
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 
@@ -51,7 +51,7 @@ function Show-TimerInput {
             $form.DialogResult = "OK"
             if ($isAdmin) {
 
-            # 🔁 AC Power - Set lid close action to 'Sleep'
+                # 🔁 AC Power - Set lid close action to 'Sleep'
                 powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 0
 
                 # 🔁 Battery Power - Set lid close action to 'Sleep'
@@ -63,7 +63,7 @@ function Show-TimerInput {
             }
 
             $form.Close()
-    })
+        })
     $form.Controls.Add($okButton)
     $form.AcceptButton = $okButton
 
@@ -92,16 +92,16 @@ function Show-TimerInput {
 function Show-CancelPopup {
     if ($isAdmin) {
 
-            # 🔁 AC Power - Set lid close action to 'Sleep'
-                powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
+        # 🔁 AC Power - Set lid close action to 'Sleep'
+        powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
 
-                # 🔁 Battery Power - Set lid close action to 'Sleep'
-                powercfg /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
+        # 🔁 Battery Power - Set lid close action to 'Sleep'
+        powercfg /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION 1
 
-                # 🔄 Apply changes
-                powercfg /S SCHEME_CURRENT
+        # 🔄 Apply changes
+        powercfg /S SCHEME_CURRENT
             
-            }
+    }
     
 
     [System.Media.SystemSounds]::Hand.Play()
