@@ -17,11 +17,14 @@ $ES_SYSTEM_REQUIRED = [uint32]::Parse("1")
 $ES_DISPLAY_REQUIRED = [uint32]::Parse("2") 
 
 # Combine flags to prevent sleep + lock (display off)
-$flags = $ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED -bor $ES_DISPLAY_REQUIRED
+$flags = $ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED  -bor $ES_DISPLAY_REQUIRED
 [SleepBlocker]::SetThreadExecutionState($flags) | Out-Null
 
 
 # ✅ Check if running as Administrator
+
+# Check if script is running as administrator
+
 $isAdmin = ([Security.Principal.WindowsPrincipal] `
         [Security.Principal.WindowsIdentity]::GetCurrent()
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
