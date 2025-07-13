@@ -1,21 +1,31 @@
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing  
 
+# Ensure the script runs with elevated privileges
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public class SleepBlocker {
+    [DllImport("kernel32.dll")]
+    public static extern uint SetThreadExecutionState(uint esFlags);
+}
+"@
+
+# Workaround: use [uint32]::Parse with unsigned decimal value strings
+$ES_CONTINUOUS = [uint32]::Parse("2147483648")
+$ES_SYSTEM_REQUIRED = [uint32]::Parse("1")
+
+# Prevent sleep
+[SleepBlocker]::SetThreadExecutionState($ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED) | Out-Null
+
+
+
 # ✅ Check if running as Administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] `
         [Security.Principal.WindowsIdentity]::GetCurrent()
 ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 
-
-# Get the current Lid close action (plugged in) setting
-$lidCloseRaw = powercfg /query SCHEME_CURRENT SUB_BUTTONS LIDACTION | Select-String "Power Setting Index" | Select-Object -First 1
-
-# Extract the value (in hex, like 0x00000001)
-#$hexValue = ($lidCloseRaw -split ':')[1].Trim()
-
-# Convert hex to integer
-#$lidClose = [convert]::ToInt32($hexValue, 16)
 
 
 
@@ -103,6 +113,9 @@ function Show-TimerInput {
 }
 
 function Show-CancelPopup {
+    # Restore sleep
+[SleepBlocker]::SetThreadExecutionState($ES_CONTINUOUS) | Out-Null
+
     if ($isAdmin) {
 
         # 🔁 AC Power - Set lid close action to 'Sleep'
