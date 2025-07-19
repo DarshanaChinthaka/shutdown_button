@@ -179,7 +179,41 @@ if ($minutes -eq $null -or $minutes -le 0) { return }
 $shutdownTime = ($minutes * 60) - 15
 if ($shutdownTime -lt 0) { $shutdownTime = 0 }
 
-Start-Sleep -Seconds $shutdownTime
+
+# --- Show countdown timer window ---
+$timerForm = New-Object System.Windows.Forms.Form
+$timerForm.Text = "Shutdown Countdown"
+$timerForm.Size = New-Object System.Drawing.Size(300, 120)
+$timerForm.StartPosition = "CenterScreen"
+$timerForm.BackColor = "White"
+$timerForm.TopMost = $true
+$timerForm.FormBorderStyle = 'FixedDialog'
+$timerForm.MaximizeBox = $false
+$timerForm.MinimizeBox = $true
+
+$timerLabel = New-Object System.Windows.Forms.Label
+$timerLabel.Text = "Shutdown in: $($shutdownTime) seconds"
+$timerLabel.Location = New-Object System.Drawing.Point(40, 30)
+$timerLabel.Size = New-Object System.Drawing.Size(220, 30)
+$timerLabel.Font = New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold)
+$timerLabel.TextAlign = 'MiddleCenter'
+$timerForm.Controls.Add($timerLabel)
+
+$script:countdown = $shutdownTime
+$timer = New-Object System.Windows.Forms.Timer
+$timer.Interval = 1000
+$timer.Add_Tick({
+    $script:countdown--
+    $timerLabel.Text = "Shutdown in: $($script:countdown) seconds"
+    if ($script:countdown -le 0) {
+        $timer.Stop()
+        $timerForm.Close()
+    }
+})
+$timer.Start()
+[void]$timerForm.ShowDialog()
+
+# --- After countdown, show cancel popup ---
 Show-CancelPopup
 
 if (-not $global:cancelled) {
