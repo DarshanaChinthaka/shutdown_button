@@ -183,17 +183,18 @@ if ($shutdownTime -lt 0) { $shutdownTime = 0 }
 # --- Show countdown timer window ---
 $timerForm = New-Object System.Windows.Forms.Form
 $timerForm.Text = "Shutdown Countdown"
-$timerForm.Size = New-Object System.Drawing.Size(300, 120)
+$timerForm.Size = New-Object System.Drawing.Size(310, 60)
 $timerForm.StartPosition = "CenterScreen"
-$timerForm.BackColor = "White"
+$timerForm.FormBorderStyle = 'None'           # No border or buttons
+$timerForm.BackColor = 'white'              # Use a unique color
+# $timerForm.TransparencyKey = 'black'        # Make that color transparent
+$timerForm.Opacity = 0.35
 $timerForm.TopMost = $true
-$timerForm.FormBorderStyle = 'FixedDialog'
-$timerForm.MaximizeBox = $false
-$timerForm.MinimizeBox = $true
+
 
 $timerLabel = New-Object System.Windows.Forms.Label
 $timerLabel.Text = "Shutdown in: $($shutdownTime) seconds"
-$timerLabel.Location = New-Object System.Drawing.Point(40, 30)
+$timerLabel.Location = New-Object System.Drawing.Point(30, 20)
 $timerLabel.Size = New-Object System.Drawing.Size(220, 30)
 $timerLabel.Font = New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold)
 $timerLabel.TextAlign = 'MiddleCenter'
